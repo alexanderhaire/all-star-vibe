@@ -2,6 +2,11 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Features
+
+- Live horse racing mini-game with interactive betting.
+- Immersive sound effects and celebratory visuals enhance each race.
+
 ## Available Scripts
 
 In the project directory, you can run:

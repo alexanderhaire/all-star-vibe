@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const horses = ['Thunderbolt ⚡', 'Golden Mane 🌟', 'Midnight Runner 🌙', 'Red Comet ☄️'];
@@ -8,11 +8,29 @@ const HorseRace = () => {
   const [raceOn, setRaceOn] = useState(false);
   const [winner, setWinner] = useState('');
 
+  const playSound = (frequency = 440, duration = 0.15) => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = frequency;
+      osc.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+      setTimeout(() => ctx.close(), duration * 1000);
+    } catch (e) {
+      // fail silently if Web Audio API is not available
+    }
+  };
+
   const placeBet = (horse) => {
+    playSound(880, 0.1);
     setBets((prev) => ({ ...prev, [horse]: (prev[horse] || 0) + 10 }));
   };
 
   const startRace = () => {
+    playSound(440, 0.2);
     setRaceOn(true);
     const winningHorse = horses[Math.floor(Math.random() * horses.length)];
     setTimeout(() => {
@@ -20,6 +38,12 @@ const HorseRace = () => {
       setWinner(winningHorse);
     }, 4000);
   };
+
+  useEffect(() => {
+    if (winner && !raceOn) {
+      playSound(660, 0.4);
+    }
+  }, [winner, raceOn]);
 
   return (
     <div className="p-6 bg-green-500 rounded-xl shadow-xl">
@@ -61,9 +85,19 @@ const HorseRace = () => {
       )}
 
       {winner && !raceOn && (
-        <div className="mt-4 text-2xl text-white font-bold">
-          🏆 Winner: {winner}! {bets[winner] ? `You won ${bets[winner] * 2} 🪙` : "Better luck next time!"}
-        </div>
+        <>
+          <div className="mt-4 text-2xl text-white font-bold">
+            🏆 Winner: {winner}! {bets[winner] ? `You won ${bets[winner] * 2} 🪙` : "Better luck next time!"}
+          </div>
+          <motion.div
+            initial={{ scale: 0.5, opacity: 1 }}
+            animate={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 2 }}
+            className="fixed inset-0 pointer-events-none flex items-center justify-center z-50"
+          >
+            <div className="text-6xl">🎉</div>
+          </motion.div>
+        </>
       )}
     </div>
   );
