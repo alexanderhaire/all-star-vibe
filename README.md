@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Horse Race Mini-Game
+
+The app includes a simple horse racing game. Starting a race now gives each horse a randomly assigned speed and a galloping animation. The first horse to reach the finish line wins and the result is displayed after the race.
+
 ## Available Scripts
 
 In the project directory, you can run:

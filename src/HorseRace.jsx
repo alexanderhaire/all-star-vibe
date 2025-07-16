@@ -7,18 +7,29 @@ const HorseRace = () => {
   const [bets, setBets] = useState({});
   const [raceOn, setRaceOn] = useState(false);
   const [winner, setWinner] = useState('');
+  const [horseSpeeds, setHorseSpeeds] = useState({});
 
   const placeBet = (horse) => {
     setBets((prev) => ({ ...prev, [horse]: (prev[horse] || 0) + 10 }));
   };
 
   const startRace = () => {
+    const speeds = {};
+    horses.forEach(horse => {
+      speeds[horse] = Math.random() * 3 + 2; // 2-5 seconds
+    });
+    setHorseSpeeds(speeds);
     setRaceOn(true);
-    const winningHorse = horses[Math.floor(Math.random() * horses.length)];
+
+    const winningHorse = horses.reduce((a, b) =>
+      speeds[a] < speeds[b] ? a : b
+    );
+
+    const raceDuration = Math.max(...Object.values(speeds)) * 1000;
     setTimeout(() => {
       setRaceOn(false);
       setWinner(winningHorse);
-    }, 4000);
+    }, raceDuration);
   };
 
   return (
@@ -46,12 +57,15 @@ const HorseRace = () => {
 
       {raceOn && (
         <div className="mt-6">
-          {horses.map((horse, i) => (
+          {horses.map((horse) => (
             <motion.div
               key={horse}
-              initial={{ x: 0 }}
-              animate={{ x: '80vw' }}
-              transition={{ duration: Math.random() * 3 + 2 }}
+              initial={{ x: 0, y: 0 }}
+              animate={{ x: '80vw', y: ['0%', '-15%', '0%', '15%', '0%'] }}
+              transition={{
+                x: { duration: horseSpeeds[horse], ease: 'linear' },
+                y: { duration: 0.5, repeat: Infinity, ease: 'easeInOut' },
+              }}
               className="mb-2 text-xl"
             >
               {horse}
