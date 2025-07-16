@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
+import { CoinContext } from './CoinContext';
 
 const horses = ['Thunderbolt ⚡', 'Golden Mane 🌟', 'Midnight Runner 🌙', 'Red Comet ☄️'];
 
 const HorseRace = () => {
+  const { coins, spendCoins, addCoins } = useContext(CoinContext);
   const [bets, setBets] = useState({});
   const [raceOn, setRaceOn] = useState(false);
   const [winner, setWinner] = useState('');
+  const [payout, setPayout] = useState(0);
 
   const placeBet = (horse) => {
-    setBets((prev) => ({ ...prev, [horse]: (prev[horse] || 0) + 10 }));
+    if (coins >= 10 && !raceOn) {
+      spendCoins(10);
+      setBets((prev) => ({ ...prev, [horse]: (prev[horse] || 0) + 10 }));
+    }
   };
 
   const startRace = () => {
@@ -17,7 +23,16 @@ const HorseRace = () => {
     const winningHorse = horses[Math.floor(Math.random() * horses.length)];
     setTimeout(() => {
       setRaceOn(false);
+      const winningBet = bets[winningHorse] || 0;
       setWinner(winningHorse);
+      if (winningBet) {
+        const reward = winningBet * 2;
+        addCoins(reward);
+        setPayout(reward);
+      } else {
+        setPayout(0);
+      }
+      setBets({});
     }, 4000);
   };
 
@@ -27,9 +42,10 @@ const HorseRace = () => {
       <div className="mb-4 space-y-2">
         {horses.map((horse, i) => (
           <div key={horse} className="flex items-center">
-            <button 
-              onClick={() => placeBet(horse)} 
-              className="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 rounded-md shadow mr-4"
+            <button
+              onClick={() => placeBet(horse)}
+              disabled={coins < 10 || raceOn}
+              className={`px-3 py-1 rounded-md shadow mr-4 ${coins < 10 || raceOn ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-500'}`}
             >
               Bet 10 🪙
             </button>
@@ -37,9 +53,10 @@ const HorseRace = () => {
           </div>
         ))}
       </div>
-      <button 
-        onClick={startRace} 
-        className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded"
+      <button
+        onClick={startRace}
+        disabled={raceOn || Object.keys(bets).length === 0}
+        className={`text-white font-semibold px-4 py-2 rounded ${raceOn || Object.keys(bets).length === 0 ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'}`}
       >
         Start Race 🚩
       </button>
@@ -62,7 +79,7 @@ const HorseRace = () => {
 
       {winner && !raceOn && (
         <div className="mt-4 text-2xl text-white font-bold">
-          🏆 Winner: {winner}! {bets[winner] ? `You won ${bets[winner] * 2} 🪙` : "Better luck next time!"}
+          🏆 Winner: {winner}! {payout ? `You won ${payout} 🪙` : "Better luck next time!"}
         </div>
       )}
     </div>
