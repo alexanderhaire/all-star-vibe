@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
-const horses = ['Thunderbolt ⚡', 'Golden Mane 🌟', 'Midnight Runner 🌙', 'Red Comet ☄️'];
+const API_URL = 'http://localhost:5000/horse_odds';
 
 const HorseRace = () => {
   const [bets, setBets] = useState({});
   const [raceOn, setRaceOn] = useState(false);
   const [winner, setWinner] = useState('');
+  const [horses, setHorses] = useState([]);
 
-  const placeBet = (horse) => {
-    setBets((prev) => ({ ...prev, [horse]: (prev[horse] || 0) + 10 }));
+  useEffect(() => {
+    axios.get(API_URL)
+      .then(res => {
+        setHorses(res.data);
+      })
+      .catch(err => console.error('Failed to fetch horse data', err));
+  }, []);
+
+  const placeBet = (horseName) => {
+    setBets((prev) => ({ ...prev, [horseName]: (prev[horseName] || 0) + 10 }));
   };
 
   const startRace = () => {
     setRaceOn(true);
-    const winningHorse = horses[Math.floor(Math.random() * horses.length)];
+    const winningHorse = horses[Math.floor(Math.random() * horses.length)].name;
     setTimeout(() => {
       setRaceOn(false);
       setWinner(winningHorse);
@@ -25,15 +35,17 @@ const HorseRace = () => {
     <div className="p-6 bg-green-500 rounded-xl shadow-xl">
       <h2 className="text-3xl font-bold text-white mb-4">🏇 Live Horse Racing!</h2>
       <div className="mb-4 space-y-2">
-        {horses.map((horse, i) => (
-          <div key={horse} className="flex items-center">
-            <button 
-              onClick={() => placeBet(horse)} 
+        {horses.map((horse) => (
+          <div key={horse.name} className="flex items-center">
+            <button
+              onClick={() => placeBet(horse.name)}
               className="px-3 py-1 bg-yellow-400 hover:bg-yellow-500 rounded-md shadow mr-4"
             >
               Bet 10 🪙
             </button>
-            <span>{horse} (Bet: {bets[horse] || 0} 🪙)</span>
+            <span>
+              {horse.name} - {horse.personality} (Odds: {horse.odds}:1, Bet: {bets[horse.name] || 0} 🪙)
+            </span>
           </div>
         ))}
       </div>
@@ -46,15 +58,15 @@ const HorseRace = () => {
 
       {raceOn && (
         <div className="mt-6">
-          {horses.map((horse, i) => (
+          {horses.map((horse) => (
             <motion.div
-              key={horse}
+              key={horse.name}
               initial={{ x: 0 }}
               animate={{ x: '80vw' }}
               transition={{ duration: Math.random() * 3 + 2 }}
               className="mb-2 text-xl"
             >
-              {horse}
+              {horse.name}
             </motion.div>
           ))}
         </div>
