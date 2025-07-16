@@ -1,0 +1,6 @@
+[
+  {"name": "Thunderbolt ⚡", "speed": 90, "endurance": 80, "experience": 70, "personality": "Aggressive"},
+  {"name": "Golden Mane 🌟", "speed": 85, "endurance": 85, "experience": 60, "personality": "Calm"},
+  {"name": "Midnight Runner 🌙", "speed": 80, "endurance": 70, "experience": 80, "personality": "Steady"},
+  {"name": "Red Comet ☄️", "speed": 88, "endurance": 75, "experience": 65, "personality": "Fiery"}
+]
