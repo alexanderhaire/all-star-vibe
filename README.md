@@ -15,6 +15,10 @@ In the project directory, you can run:
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
+When running the app with **Bun** or using **Vite**'s preview server make sure
+the process listens on **port 3000**. This matches the `internal_port` value
+defined in `fly.toml` for deployment on Fly.io.
+
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
